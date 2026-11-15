@@ -51,6 +51,7 @@ __all__ = [
     "make_interactions",
     "make_air_quality_stations",
     "make_catalyst_experiments",
+    "make_nir_spectra",
     "LEAKAGE_COLUMNS",
 ]
 
@@ -731,6 +732,44 @@ def make_catalyst_experiments(n_conditions: int = 24, n_rep: int = 3, seed: int 
                          "h2_co_ratio": round(ratio, 3), "conversion_pct": float(np.clip(conv, 0, 100).round(2)),
                          "conversion_sd_instrument": 1.5, "failed_run": int(failed)})
     return pd.DataFrame(rows)
+
+
+# ---------------------------------------------------------------------------
+# 11. Near-infrared spectra (high-dimensional, p >> n)
+# ---------------------------------------------------------------------------
+def make_nir_spectra(n: int = 150, n_wavelengths: int = 400, seed: int = 42):
+    """Absorbance spectra (1100–2500 nm) of liquid samples containing three components.
+
+    Returns (spectra DataFrame [n × n_wavelengths], targets DataFrame).
+    Targets: ``analyte_pct`` (the quantity to predict), ``water_pct``, ``solvent_pct``,
+    plus ``batch`` (measurement day). Spectra = Σ concentration × pure-component band
+    shapes (overlapping Gaussian bands) + baseline offset/slope + multiplicative scatter
+    + noise; the analyte has weak bands overlapped by water — a classic chemometrics case
+    where PCA/PLS and preprocessing (derivatives, SNV) matter.
+    """
+    rng = np.random.default_rng(seed)
+    wl = np.linspace(1100, 2500, n_wavelengths)
+
+    def bands(centres, widths, heights):
+        return sum(h * np.exp(-0.5 * ((wl - c) / w) ** 2) for c, w, h in zip(centres, widths, heights))
+
+    pure = {"analyte": bands([1210, 1730, 2310], [25, 30, 35], [0.25, 0.35, 0.30]),
+            "water": bands([1450, 1940], [60, 70], [0.9, 1.4]),
+            "solvent": bands([1690, 2140, 2270], [40, 50, 45], [0.5, 0.6, 0.45])}
+    analyte = rng.uniform(1, 12, n)
+    water = rng.uniform(5, 30, n) + 0.3 * analyte            # mild correlation between components
+    solvent = 100 - analyte - water
+    C = np.column_stack([analyte, water, solvent]) / 100
+    A = C @ np.vstack([pure["analyte"], pure["water"], pure["solvent"]])
+    batch = rng.integers(0, 5, n)
+    offset = rng.normal(0, 0.05, n) + 0.03 * batch
+    slope = rng.normal(0, 2e-5, n)
+    scatter = rng.lognormal(0, 0.05, n)
+    X = scatter[:, None] * A + offset[:, None] + slope[:, None] * (wl - 1100) + rng.normal(0, 0.003, (n, n_wavelengths))
+    spectra = pd.DataFrame(X, columns=[f"nm_{int(round(w))}" for w in wl])
+    targets = pd.DataFrame({"analyte_pct": analyte.round(3), "water_pct": water.round(3),
+                            "solvent_pct": solvent.round(3), "batch": batch})
+    return spectra, targets
 
 
 if __name__ == "__main__":  # quick smoke test
