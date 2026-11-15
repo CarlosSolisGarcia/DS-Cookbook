@@ -41,6 +41,7 @@ __all__ = [
     "load_clean_process_yield",
     "make_equipment_failure",
     "make_energy_demand",
+    "load_regular_energy_demand",
     "LEAKAGE_COLUMNS",
 ]
 
@@ -329,6 +330,27 @@ def make_energy_demand(
         keep &= ~((df["timestamp"] >= o_start) & (df["timestamp"] < o_start + pd.Timedelta("6D")))
         df = df[keep]
     return df.reset_index(drop=True)
+
+
+def load_regular_energy_demand(seed: int = 42) -> pd.DataFrame:
+    """Daily demand on a complete, regular DatetimeIndex with the decisions of
+    05_time_series/preprocessing.md applied: missing days re-inserted, the
+    meter-glitch spike replaced by NaN, gaps filled by time interpolation
+    (``demand_was_missing`` flags them). Index name: ``timestamp``; freq "D"."""
+    df = make_energy_demand(seed=seed).set_index("timestamp").asfreq("D")
+    d = df["demand_mwh"]
+    # reference = rolling median of the same weekday; known holidays are never flagged
+    ref = d.groupby(d.index.dayofweek).transform(lambda g: g.rolling(5, center=True, min_periods=2).median())
+    resid = d - ref
+    mad = resid.abs().rolling(61, center=True, min_periods=10).median()
+    holiday = pd.Series(d.index.strftime("%m-%d").isin(HOLIDAYS_MMDD), index=d.index)
+    d = d.mask((resid.abs() > 10 * 1.4826 * mad) & ~holiday)
+    df["demand_was_missing"] = d.isna().astype(int)
+    df["demand_mwh"] = d.interpolate(method="time", limit_direction="both")
+    df["temperature_c"] = df["temperature_c"].interpolate(method="time", limit_direction="both")
+    idx = df.index
+    df["is_holiday"] = idx.strftime("%m-%d").isin(HOLIDAYS_MMDD).astype(int)
+    return df
 
 
 if __name__ == "__main__":  # quick smoke test
