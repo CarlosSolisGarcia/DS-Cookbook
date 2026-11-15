@@ -43,7 +43,7 @@ These principles cannot be broken by any rule of thumb below. When a rule and a 
 
 ```
 Is the target observed (labelled) for historical examples?
-├── No  → Unsupervised: clustering / anomaly detection (future extension)
+├── No  → Unsupervised: 09_unsupervised_learning (groups), 10_anomaly_detection (unusual cases), 11_dimensionality_reduction
 └── Yes → Is the order of observations in time essential to the question?
           ├── Yes, I need values at FUTURE time points of the same series
           │      → FORECASTING → 05_time_series/time_series_workflow.md
