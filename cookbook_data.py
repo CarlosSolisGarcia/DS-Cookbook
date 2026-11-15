@@ -38,6 +38,7 @@ import pandas as pd
 
 __all__ = [
     "make_process_yield",
+    "load_clean_process_yield",
     "make_equipment_failure",
     "make_energy_demand",
     "LEAKAGE_COLUMNS",
@@ -161,6 +162,17 @@ def make_process_yield(n: int = 2000, seed: int = 42, include_leakage: bool = Tr
     dups = df.sample(10, random_state=seed)
     df = pd.concat([df, dups]).sort_values("start_time").reset_index(drop=True)
     return df
+
+
+def load_clean_process_yield(seed: int = 42) -> pd.DataFrame:
+    """``make_process_yield`` with the data-quality decisions of
+    01_data_understanding/data_quality.md applied (dedupe, sentinel -> NaN,
+    drop unit-error rows, drop the leakage column), sorted by time.
+    Used by the regression recipes so they don't repeat the cleaning code."""
+    df = make_process_yield(seed=seed).drop_duplicates()
+    df["temperature_c"] = df["temperature_c"].mask(df["temperature_c"] == -999)
+    df = df[df["yield_kg"] > 1].drop(columns="qc_purity_pct")
+    return df.sort_values("start_time").reset_index(drop=True)
 
 
 # ---------------------------------------------------------------------------
