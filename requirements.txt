@@ -1,0 +1,13 @@
+# Versions the code examples were validated with (python tools/validate_code_blocks.py).
+# Minimums in comments: older versions may lack some APIs used.
+numpy==2.5.3            # >=1.26
+pandas==3.0.5           # >=2.2 (frequency aliases "h", "ME")
+scikit-learn==1.9.1     # >=1.5 (TunedThresholdClassifierCV, FrozenEstimator needs 1.6)
+scipy
+matplotlib
+seaborn
+statsmodels==0.15.0     # >=0.14
+xgboost==3.4.1          # >=2.0
+lightgbm==4.7.0         # >=4.0
+imbalanced-learn==0.14.2
+shap
