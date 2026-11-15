@@ -122,21 +122,44 @@ Unsupervised steps (scaling, median imputation) leak much less in practice, but 
 
 ### 4.3 Group leakage
 
+The clearest case is **experimental replicates**. Several measurements of the same formulation share the same inputs and a formulation-specific effect that the inputs do not explain:
+
+```python
+from sklearn.ensemble import RandomForestRegressor
+from sklearn.model_selection import KFold
+
+rng = np.random.default_rng(0)
+n_form, n_rep = 80, 5                                   # 80 formulations × 5 replicate measurements
+comp = rng.uniform(0, 1, (n_form, 4))                   # composition of each formulation
+form_effect = rng.normal(0, 1.0, n_form)                # formulation effect NOT explained by composition
+y_form = 2 * comp[:, 0] - comp[:, 1] ** 2 + form_effect
+X_rep = np.repeat(comp, n_rep, axis=0) + rng.normal(0, 0.01, (n_form * n_rep, 4))  # tiny dosing noise
+y_rep = np.repeat(y_form, n_rep) + rng.normal(0, 0.2, n_form * n_rep)              # measurement noise
+g_rep = np.repeat(np.arange(n_form), n_rep)
+
+rf = RandomForestRegressor(n_estimators=300, random_state=0, n_jobs=-1)
+r2_random = cross_val_score(rf, X_rep, y_rep, cv=KFold(5, shuffle=True, random_state=0), scoring="r2")
+r2_group = cross_val_score(rf, X_rep, y_rep, cv=GroupKFold(5), groups=g_rep, scoring="r2")
+print(f"R² random K-fold = {r2_random.mean():.2f}   grouped by formulation = {r2_group.mean():.2f}")
+# ≈ 0.92 vs ≈ 0.0: under random K-fold the model "predicts" a replicate from its siblings.
+# For a NEW formulation it has almost no skill, because composition explains little here.
+```
+
+Always run the same comparison on your own data. Here is the machine-fleet version:
+
 ```python
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.model_selection import KFold
 
 features = ["age_years", "load_pct", "operating_hours", "days_since_maintenance",
             "vibration_rms", "temperature_c", "error_count_7d"]
-X = df[features]
-rf = make_pipeline(SimpleImputer(strategy="median"),
-                   RandomForestClassifier(n_estimators=300, min_samples_leaf=1, random_state=0, n_jobs=-1))
-
-random_cv = cross_val_score(rf, X, y, cv=KFold(5, shuffle=True, random_state=0), scoring="average_precision")
-group_cv = cross_val_score(rf, X, y, cv=GroupKFold(5), groups=groups, scoring="average_precision")
-print(f"PR-AUC random K-fold: {random_cv.mean():.3f}   grouped: {group_cv.mean():.3f}")
-# Random K-fold puts the same machine in train and validation folds. The model can
-# partially recognise machines (shared frailty), so the random-split estimate tends to be optimistic.
+rf_clf = make_pipeline(SimpleImputer(strategy="median"),
+                       RandomForestClassifier(n_estimators=300, min_samples_leaf=5, random_state=0, n_jobs=-1))
+for name, cv_, g in [("random K-fold", KFold(5, shuffle=True, random_state=0), None),
+                     ("GroupKFold", GroupKFold(5), groups)]:
+    s = cross_val_score(rf_clf, df[features], y, cv=cv_, groups=g, scoring="average_precision")
+    print(f"PR-AUC {name:13s}: {s.mean():.3f} ± {s.std():.3f}")
+# In this dataset the gap is small: the features change month to month, so machines are hard to
+# "recognise". The size of the gap is an empirical question. Measure it rather than assume it.
 ```
 
 ### 4.4 Temporal leakage in rolling features
@@ -153,7 +176,7 @@ print(pd.DataFrame({"s": s, "leaky_centered": leaky, "safe_past_only": safe}))
 ## 5. Interpretation
 
 - **Univariate screen.** Real predictors on hard problems typically have univariate AUC of 0.55–0.75. A single feature at 0.95+ is almost always leakage, or a trivial re-encoding of the target.
-- **Random vs. grouped CV gap.** A large gap means the model exploits entity identity. If production predicts on **new** entities, trust the grouped estimate. If it predicts on the same entities in the future, use a temporal split, and entity features may then be legitimate.
+- **Random vs. grouped CV gap.** A large gap (as in the replicate example) means the model exploits entity identity. If production predicts on **new** entities, trust the grouped estimate. If it predicts on the same entities in the future, use a temporal split, and entity features may then be legitimate.
 - **Leaky vs. honest pipeline gap.** Any noticeable gap shows that preprocessing decisions were adapting to validation data.
 - **CV good, production bad.** Classic leakage or drift. Re-audit column timing first, then the split.
 

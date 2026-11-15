@@ -214,7 +214,7 @@ def make_equipment_failure(
     c_bearing = 1.4 * np.log(df["vibration_rms"].to_numpy() / 2.0) + 0.004 * df["days_since_maintenance"].to_numpy()
     c_heat = 0.08 * (df["temperature_c"].to_numpy() - 72) + 0.6 * (df["machine_type"].to_numpy() == "H")
     c_elec = 0.35 * df["error_count_7d"].to_numpy() - 0.5 * (df["firmware"].to_numpy() == "v3")
-    lin = c_bearing + c_heat + c_elec + 0.6 * df["frailty"].to_numpy()
+    lin = c_bearing + c_heat + c_elec + 1.5 * df["frailty"].to_numpy()
 
     lo, hi = -15.0, 5.0  # bisection for intercept giving the requested prevalence
     for _ in range(60):
