@@ -23,7 +23,7 @@ Understand **what a model has learned**. Use that to (a) check it against domain
 | **SHAP values** | Additive attribution of a prediction to the features (relative to a baseline) | Local, aggregatable to global | Expensive for non-tree models; depends on the background data; **not causal** |
 | **ALE plots** (not covered in code) | Effect shape using conditional distributions | Global | Better than PDP with correlated features |
 
-**The crucial limit: these tools explain the *model*, not the *world*.** "The model relies on vibration" ≠ "vibration causes failure". Under correlation, the model can rely on a proxy. For causal claims you need designed experiments or causal methods ([problem_framing.md](../00_methodology/problem_framing.md) §2.1).
+**The crucial limit: these tools explain the *model*, not the *world*.** "The model relies on vibration" ≠ "vibration causes failure". Under correlation, the model can rely on a proxy. For causal claims you need designed experiments or causal methods ([problem_framing.md](../00_methodology/problem_framing.md) §3.1).
 
 ## 4. Assumptions and limitations
 - Interpretation of a poorly performing model is meaningless. Interpret models that generalise.

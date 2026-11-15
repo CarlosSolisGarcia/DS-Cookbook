@@ -11,7 +11,7 @@ This is the master procedure for predicting a continuous quantity: yield, energy
 - The target is numeric and its magnitude matters: predicting 10 vs 12 is better than 10 vs 30.
 - Not when the target is a category, or a number used only as a category (e.g. a defect code). That is classification.
 - Not for future values of a series that depend on their own past. That is forecasting ([05_time_series](../05_time_series/time_series_workflow.md)). Time-stamped rows with a per-row target are still regression, but with chronological validation.
-- If the decision is binary (e.g. "below spec?"), see [problem_framing.md](../00_methodology/problem_framing.md) §6 for regress-then-threshold vs. classify.
+- If the decision is binary (e.g. "below spec?"), see [problem_framing.md](../00_methodology/problem_framing.md) §8 for regress-then-threshold vs. classify.
 
 ## 3. Conceptual foundation
 A regression model estimates a **functional of the conditional distribution** of y given x. The loss determines which functional:
@@ -136,7 +136,7 @@ print(f"TEST  MAE={mean_absolute_error(test[TARGET], pred):.1f}  "
 - **IF** there are repeated measurements per entity → `GroupKFold`.
 - **IF** n < ~200 → prefer regularised linear models / small GBMs with repeated CV; see [18_scientific_machine_learning](../18_scientific_machine_learning/) for small-data practice.
 - **IF** decisions need risk ranges → add prediction intervals ([uncertainty.md](uncertainty.md)).
-- **IF** the best model barely beats the baseline → go back to framing and data ([project_lifecycle.md](../00_methodology/project_lifecycle.md) §6).
+- **IF** the best model barely beats the baseline → go back to framing and data ([project_lifecycle.md](../00_methodology/project_lifecycle.md) §8).
 
 ## 9. Common mistakes
 | Mistake | Consequence | Prevention |

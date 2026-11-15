@@ -52,7 +52,7 @@ The three main libraries usually perform similarly when tuned. Tuning and featur
 1. **Start linear** (RidgeCV), with the preprocessing from [numerical_features.md](../02_preprocessing/numerical_features.md). It is an interpretable reference.
 2. **Add a GBM with defaults and early stopping** (HistGB). It tests how much non-linearity and interaction is left.
 3. **Optionally add a random forest**, a robust reference that needs little tuning.
-4. **Compare on identical folds** with train and validation scores ([modeling_fundamentals.md](../00_methodology/modeling_fundamentals.md) §4.1).
+4. **Compare on identical folds** with train and validation scores ([modeling_fundamentals.md](../00_methodology/modeling_fundamentals.md) §6.1).
 5. **Diagnose** each model's fit (under/overfit) and look at its residuals ([error_analysis.md](error_analysis.md)).
 6. **Shortlist 1–2 models**, then tune them with a fixed budget ([hyperparameter_optimization.md](../06_model_improvement/hyperparameter_optimization.md)).
 7. **Consider constraints:** monotonicity (physics), extrapolation needs, inference latency, interpretability.

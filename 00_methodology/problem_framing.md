@@ -15,15 +15,19 @@
 - How success will be measured, both technically (the metric) and in business terms (cost, savings, risk).
 - What the **baseline** is: the current process or a trivial rule.
 
+---
+
+## 2. When to use it
+
 **When to use it.** Always, before touching data. Return to it whenever evaluation results do not translate into value.
 
 **When it is less critical.** Well-defined benchmark exercises (a Kaggle-style task with a given metric), although even then, defining the prediction time carefully protects against leakage.
 
 ---
 
-## 2. Conceptual foundation
+## 3. Conceptual foundation
 
-### 2.1 Prediction vs. explanation vs. causal inference
+### 3.1 Prediction vs. explanation vs. causal inference
 
 | Goal | Question | What you optimise | Typical tools | Cookbook coverage |
 |---|---|---|---|---|
@@ -33,7 +37,7 @@
 
 A predictive model can be excellent while its feature importances say **nothing causal**. If the stakeholder wants to *act on the inputs* ("which knob should we turn?"), you have a causal question. Say so explicitly. As a chemical engineer you already know the best tool for that question: a designed experiment.
 
-### 2.2 Prediction time and the information set
+### 3.2 Prediction time and the information set
 
 The **prediction time** (t₀) is the moment the prediction is made. Every feature must be known at t₀, in the form it will have in production. This single concept prevents most leakage (see [data_leakage.md](data_leakage.md)).
 
@@ -46,23 +50,23 @@ Examples:
 - *Yield prediction at batch start:* recipe settings and raw-material analysis are known. The average reactor temperature during the batch is **not** known. It becomes usable only if you predict mid-batch, which is a different problem.
 - *Failure in the next 30 days:* sensor readings up to the snapshot date are known. Downtime in the next 30 days is the outcome itself.
 
-### 2.3 Choosing the problem type
+### 3.3 Choosing the problem type
 
 | If the target is… | And the decision needs… | Problem family |
 |---|---|---|
 | A continuous quantity (kg, °C, €) | A number, or a number with an interval | Regression → [03_regression](../03_regression/) |
 | A category (fail / no fail, failure mode) | A class or a probability, plus an action threshold | Classification → [04_classification](../04_classification/) |
 | A future value of a time-indexed quantity | Values at future times (horizon h) | Forecasting → [05_time_series](../05_time_series/) |
-| A rare deviation without reliable labels | A flag for unusual behaviour | Anomaly detection (future extension; see [time_series_understanding.md](../05_time_series/time_series_understanding.md) §2.4) |
+| A rare deviation without reliable labels | A flag for unusual behaviour | Anomaly detection → [10_anomaly_detection](../10_anomaly_detection/) (see also [time_series_understanding.md](../05_time_series/time_series_understanding.md) §3.4) |
 
 The same business question can often be framed several ways, and the framing changes the data you need. "Predict machine failure" could be:
 - binary classification: will it fail within 30 days?
 - regression: what is the remaining useful life?
-- survival analysis: what is the time-to-failure distribution, with censoring? (future extension)
+- survival / remaining-useful-life analysis: what is the time-to-failure distribution, with censoring? (see [predictive_maintenance_rul.md](../16_industrial_sensor_data/predictive_maintenance_rul.md))
 
 Choose the framing whose output maps most directly onto the decision.
 
-### 2.4 Metrics come from costs
+### 3.4 Metrics come from costs
 
 A metric is a proxy for the cost of errors. Work out the cost structure first, then pick the metric (see [metrics_reference.md](../08_quick_references/metrics_reference.md)):
 - Are over- and under-predictions equally costly? If not, consider asymmetric metrics or quantile predictions.
@@ -71,7 +75,15 @@ A metric is a proxy for the cost of errors. Work out the cost structure first, t
 
 ---
 
-## 3. Step-by-step procedure
+## 4. Assumptions and limitations
+
+- The framing assumes stakeholders can describe the decision and the costs of errors. When they cannot, use ranges or scenarios, and revisit after a first model exists.
+- A good framing does not guarantee that the data contain the needed signal. That is found out in stages 2–10.
+- Causal questions need designs (experiments, causal inference) that this cookbook does not cover in depth.
+
+---
+
+## 5. Step-by-step procedure
 
 ### Step 1 — Identify the decision and the user
 - **Ask:** Who will use the output? What will they do differently? How often? What do they do today?
@@ -102,11 +114,11 @@ For each candidate input, record: source, update frequency, latency, whether it 
 Latency, interpretability requirements (regulated domains), fairness, cost of data collection, maintenance burden.
 
 ### Step 7 — Write the one-page problem statement
-Use the template in §4 and get it confirmed by the stakeholder.
+Use the template in §6 and get it confirmed by the stakeholder.
 
 ---
 
-## 4. Implementation: problem statement template
+## 6. Implementation: problem statement template
 
 Keep this as `README.md` or `reports/problem_statement.md` in your project. A filled-in example for the cookbook's predictive-maintenance dataset:
 
@@ -172,7 +184,7 @@ print(features)
 
 ---
 
-## 5. Interpretation
+## 7. Interpretation
 
 How to tell if the framing is good:
 - **Good framing:** you can describe the exact data available at t₀, the action taken from the output, and a baseline you have to beat. Different stakeholders describe the target the same way.
@@ -184,7 +196,7 @@ How to tell if the framing is good:
 
 ---
 
-## 6. Decision framework
+## 8. Decision framework
 
 **IF** the stakeholder asks "why does X happen?" or "what should we change?"
 → Make clear that predictive models show **associations**. Recommend designed experiments or causal methods for intervention decisions. Use interpretation tools only to *generate* hypotheses.
@@ -209,7 +221,7 @@ How to tell if the framing is good:
 
 ---
 
-## 7. Common mistakes
+## 9. Common mistakes
 
 | Mistake | Consequence | Prevention |
 |---|---|---|
@@ -223,7 +235,7 @@ How to tell if the framing is good:
 
 ---
 
-## 8. Checklist
+## 10. Checklist
 
 - [ ] The decision, the user and the frequency of use are written down.
 - [ ] Unit of prediction (what one row is) defined.
@@ -239,7 +251,7 @@ How to tell if the framing is good:
 
 ---
 
-## 9. References
+## 11. References
 
 - Provost, F. & Fawcett, T. (2013). *Data Science for Business*. O'Reilly. Ch. 2 ("Business Problems and Data Science Solutions") and Ch. 7 ("Decision Analytic Thinking": expected value, costs).
 - Shmueli, G. (2010). "To Explain or to Predict?" *Statistical Science* 25(3), 289–310. https://doi.org/10.1214/10-STS330

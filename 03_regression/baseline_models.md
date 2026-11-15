@@ -1,6 +1,6 @@
 # Regression Baselines
 
-> **Folder:** 03_regression · **Prev:** [regression_workflow.md](regression_workflow.md) · **Next:** [model_selection.md](model_selection.md) · **Related:** [modeling_fundamentals.md](../00_methodology/modeling_fundamentals.md) §2.4
+> **Folder:** 03_regression · **Prev:** [regression_workflow.md](regression_workflow.md) · **Next:** [model_selection.md](model_selection.md) · **Related:** [modeling_fundamentals.md](../00_methodology/modeling_fundamentals.md) §3.4
 
 ---
 

@@ -10,13 +10,17 @@
 
 **What it solves.** It sets out the shared logic of modelling: why baselines come first, how to pick candidate models, what overfitting and underfitting look like and how to diagnose them, and how to evaluate a model so the result carries over to deployment.
 
+---
+
+## 2. When to use it
+
 **When to use it.** Before the first model in any project, and whenever you need to decide "more complex or not?".
 
 ---
 
-## 2. Conceptual foundation
+## 3. Conceptual foundation
 
-### 2.1 Generalisation and the three datasets
+### 3.1 Generalisation and the three datasets
 
 | Set | Used for | Never used for |
 |---|---|---|
@@ -26,7 +30,7 @@
 
 Cross-validation turns the training data into many train/validation pairs. It gives a more stable validation estimate **and** a measure of its variability. See [cross_validation.md](../06_model_improvement/cross_validation.md).
 
-### 2.2 Bias–variance in one paragraph
+### 3.2 Bias–variance in one paragraph
 
 Expected error on new data = irreducible noise + bias² + variance.
 - **Bias** is systematic error from a model too simple to represent the relationship (underfitting).
@@ -34,7 +38,7 @@ Expected error on new data = irreducible noise + bias² + variance.
 
 More flexible models reduce bias and increase variance. Regularisation, more data and ensembling (bagging) reduce variance. **Irreducible noise** sets a floor that no model can go below. It includes measurement error in the target, label noise and drivers you did not measure.
 
-### 2.3 Diagnosing fit
+### 3.3 Diagnosing fit
 
 | Pattern | Train error | Validation error | Diagnosis | Typical remedies |
 |---|---|---|---|---|
@@ -45,13 +49,13 @@ More flexible models reduce bias and increase variance. Regularisation, more dat
 
 A **learning curve** (score vs. training-set size) tells you whether more data would help. If the validation curve is still rising at full size, it would. If it has plateaued close to the training curve, more data will not help much; you need better features.
 
-### 2.4 Why baselines first
+### 3.4 Why baselines first
 
 A baseline answers: *How much of the score is just the easy part?* Without it you cannot tell whether R² = 0.6 is impressive or trivial. Two baselines are useful:
 1. **A trivial baseline** (mean, majority class, last value) sets the zero point of skill.
 2. **A simple, informed baseline** (current practice, a one-feature rule, a linear model) sets the bar that complexity must beat.
 
-### 2.5 Model selection principles (tabular data)
+### 3.5 Model selection principles (tabular data)
 
 - There is **no universally best algorithm** (the "no free lunch" theorem). Empirically, for medium-sized tabular data, gradient-boosted trees are a very strong default. Regularised linear models remain competitive when n is small, relations are close to linear, or extrapolation and interpretability matter.
 - **Compare candidates on the same folds, with the same preprocessing constraints and a similar tuning effort.** If one model gets extensive tuning and another uses defaults, the comparison is biased.
@@ -59,7 +63,15 @@ A baseline answers: *How much of the score is just the easy part?* Without it yo
 
 ---
 
-## 3. Step-by-step procedure
+## 4. Assumptions and limitations
+
+- The bias–variance decomposition is exact for squared error; for other losses it is a useful intuition rather than an identity.
+- Learning curves assume that more data would come from the same distribution. Under drift, more *old* data can hurt.
+- "Gradient boosting is a strong default" is an empirical regularity for medium-sized tabular data, not a law. Small data, extrapolation or strong linear structure can favour simpler models (see the cookbook's own regression and classification examples).
+
+---
+
+## 5. Step-by-step procedure
 
 1. **Fix the validation scheme** ([validation_reference.md](../08_quick_references/validation_reference.md)). Fix the folds (a seeded splitter object) so that all models see identical splits.
 2. **Trivial baseline.** Record its score with the same CV.
@@ -70,15 +82,15 @@ A baseline answers: *How much of the score is just the easy part?* Without it yo
 7. **Decide the next step**:
    - The flexible model is much better than linear → non-linearity or interactions matter. Proceed to tuning and feature engineering.
    - The flexible model ≈ linear → relationships are close to linear, or the signal is limited. Prefer the simpler model; invest in features or data.
-   - Both ≈ baseline → go back to framing or data ([project_lifecycle.md](project_lifecycle.md) §6).
+   - Both ≈ baseline → go back to framing or data ([project_lifecycle.md](project_lifecycle.md) §8).
 8. **Tune** the shortlisted model(s) ([hyperparameter_optimization.md](../06_model_improvement/hyperparameter_optimization.md)).
 9. **Evaluate** with the family-specific recipe: metrics with uncertainty, segments and residual or error analysis.
 
 ---
 
-## 4. Implementation in Python
+## 6. Implementation in Python
 
-### 4.1 A reusable model-comparison function
+### 6.1 A reusable model-comparison function
 
 ```python
 import numpy as np
@@ -102,7 +114,7 @@ def compare_models(models: dict, X, y, cv, scoring: dict, groups=None) -> pd.Dat
     return pd.DataFrame(rows).set_index("model")
 ```
 
-### 4.2 Applying it: baseline → linear → boosting (regression example)
+### 6.2 Applying it: baseline → linear → boosting (regression example)
 
 ```python
 from sklearn.compose import ColumnTransformer
@@ -146,7 +158,7 @@ table = compare_models(models, X, y, cv,
 print(table.round(3))
 ```
 
-### 4.3 Learning curve
+### 6.3 Learning curve
 
 ```python
 import matplotlib.pyplot as plt
@@ -161,7 +173,7 @@ ax.set_title("Learning curve — HistGradientBoosting")
 plt.tight_layout(); plt.show()
 ```
 
-### 4.4 Validation curve for a single complexity parameter
+### 6.4 Validation curve for a single complexity parameter
 
 ```python
 from sklearn.model_selection import ValidationCurveDisplay
@@ -175,7 +187,7 @@ plt.show()
 
 ---
 
-## 5. Interpretation
+## 7. Interpretation
 
 - **The comparison table.** Read `val_*` first: does each step beat the previous one by more than `val_*_std`? Then compare `train_*` with `val_*` to place each model in pattern A–D.
   - *Expected here:* the baseline has R² ≈ 0. Ridge captures the main linear effects (feed rate dominates). Boosting improves further because of the temperature optimum (a non-linear effect) and its interaction with the catalyst.
@@ -185,7 +197,7 @@ plt.show()
 
 ---
 
-## 6. Decision framework
+## 8. Decision framework
 
 **IF** the flexible model beats linear by much more than the CV std
 → Non-linearity matters. Tune the flexible model; still keep the linear model as an interpretable reference.
@@ -207,7 +219,7 @@ plt.show()
 
 ---
 
-## 7. Common mistakes
+## 9. Common mistakes
 
 | Mistake | Consequence | Prevention |
 |---|---|---|
@@ -220,7 +232,7 @@ plt.show()
 
 ---
 
-## 8. Checklist
+## 10. Checklist
 
 - [ ] Validation scheme fixed and seeded; identical folds for all models.
 - [ ] Trivial and informed baselines in the comparison table.
@@ -232,7 +244,7 @@ plt.show()
 
 ---
 
-## 9. References
+## 11. References
 
 - James, G. et al. (2023). *An Introduction to Statistical Learning (Python ed.)*, Ch. 2.2 (bias–variance), Ch. 5 (resampling). https://www.statlearning.com/
 - Hastie, T., Tibshirani, R. & Friedman, J. (2009). *The Elements of Statistical Learning*, Ch. 7 "Model Assessment and Selection". https://hastie.su.domains/ElemStatLearn/

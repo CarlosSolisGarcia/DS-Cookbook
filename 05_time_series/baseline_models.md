@@ -1,6 +1,6 @@
 # Forecasting Baselines: Naive, Seasonal Naive, Mean, Drift, Moving Average
 
-> **Folder:** 05_time_series · **Prev:** [validation.md](validation.md) · **Next:** [forecasting_models.md](forecasting_models.md) · **Related:** [modeling_fundamentals.md](../00_methodology/modeling_fundamentals.md) §2.4
+> **Folder:** 05_time_series · **Prev:** [validation.md](validation.md) · **Next:** [forecasting_models.md](forecasting_models.md) · **Related:** [modeling_fundamentals.md](../00_methodology/modeling_fundamentals.md) §3.4
 
 ---
 

@@ -10,15 +10,19 @@
 
 **What it solves.** Leakage happens when information that will not be available at prediction time reaches the model during training or evaluation. The result is an optimistic score that collapses in production. This recipe lists the forms leakage takes, the ways to detect them and a prevention protocol.
 
+---
+
+## 2. When to use it
+
 **When to use it.** Read it once carefully, then come back here whenever a result looks too good, whenever CV and production disagree, and before any final evaluation.
 
 ---
 
-## 2. Conceptual foundation
+## 3. Conceptual foundation
 
 Leakage is any violation of this rule: **the model, its features, its preprocessing and its evaluation may use only information that would be available at the moment of prediction, for the unit being predicted.**
 
-### 2.1 Taxonomy
+### 3.1 Taxonomy
 
 | Type | What happens | Example (cookbook datasets) |
 |---|---|---|
@@ -30,13 +34,21 @@ Leakage is any violation of this rule: **the model, its features, its preprocess
 | **Selection / tuning leakage** | Test data influence modelling choices | Choosing features, thresholds or hyperparameters after looking at test performance |
 | **Label-definition leakage** | The label's construction uses information after t₀ in a way that also shapes the features | A "failure" flag back-filled using later diagnoses that also updated sensor records |
 
-### 2.2 Why it is so common
+### 3.2 Why it is so common
 
 Leakage is rarely visible in the code. It lives in the **semantics** of the data: when a column was recorded, by whom, and whether it was updated later. That is why the prediction-time contract from [problem_framing.md](problem_framing.md) is the main defence. Code-level fixes, such as pipelines, catch only the train–test contamination type.
 
 ---
 
-## 3. Step-by-step procedure
+## 4. Assumptions and limitations
+
+- The prediction-time contract assumes you can find out *when* each column is created. That knowledge comes from the data owners and system documentation, not from the data itself.
+- Code-level defences (pipelines, splitters) only catch preprocessing, split and group leakage. Target and temporal leakage in the *semantics* of the columns need human audit.
+- Some leakage is subtle and only shows up in production (a column back-filled after the fact). Monitoring the production performance is the final safeguard.
+
+---
+
+## 5. Step-by-step procedure
 
 ### Step 1 — Audit every column's timing
 For each column ask: *When is this value created? Can it be updated after creation? Would it exist, with this value, at t₀ in production?* Record the answer in a data dictionary (see [initial_inspection.md](../01_data_understanding/initial_inspection.md)).
@@ -58,9 +70,9 @@ Compare the score with domain expectations and with the baseline. Big unexplaine
 
 ---
 
-## 4. Implementation in Python
+## 6. Implementation in Python
 
-### 4.1 Detecting target leakage with univariate screening
+### 6.1 Detecting target leakage with univariate screening
 
 ```python
 import numpy as np
@@ -91,7 +103,7 @@ print(univariate_auc(df, y, groups, exclude=["failure_30d"]).round(3))
 # downtime_hours_30d ≈ 0.98 → an outcome of the failure; it must be removed.
 ```
 
-### 4.2 Preprocessing leakage: wrong vs. right
+### 6.2 Preprocessing leakage: wrong vs. right
 
 The effect is largest with **supervised** preprocessing such as feature selection or target encoding. The classic demonstration uses pure noise:
 
@@ -120,7 +132,7 @@ print(f"leaky AUC = {wrong.mean():.2f}   honest AUC = {right.mean():.2f}")
 
 Unsupervised steps (scaling, median imputation) leak much less in practice, but put them in the pipeline anyway. Doing so costs nothing and the code then matches what happens in deployment.
 
-### 4.3 Group leakage
+### 6.3 Group leakage
 
 The clearest case is **experimental replicates**. Several measurements of the same formulation share the same inputs and a formulation-specific effect that the inputs do not explain:
 
@@ -162,7 +174,7 @@ for name, cv_, g in [("random K-fold", KFold(5, shuffle=True, random_state=0), N
 # "recognise". The size of the gap is an empirical question. Measure it rather than assume it.
 ```
 
-### 4.4 Temporal leakage in rolling features
+### 6.4 Temporal leakage in rolling features
 
 ```python
 s = pd.Series(np.arange(10, dtype=float))
@@ -173,7 +185,7 @@ print(pd.DataFrame({"s": s, "leaky_centered": leaky, "safe_past_only": safe}))
 
 ---
 
-## 5. Interpretation
+## 7. Interpretation
 
 - **Univariate screen.** Real predictors on hard problems typically have univariate AUC of 0.55–0.75. A single feature at 0.95+ is almost always leakage, or a trivial re-encoding of the target.
 - **Random vs. grouped CV gap.** A large gap (as in the replicate example) means the model exploits entity identity. If production predicts on **new** entities, trust the grouped estimate. If it predicts on the same entities in the future, use a temporal split, and entity features may then be legitimate.
@@ -182,7 +194,7 @@ print(pd.DataFrame({"s": s, "leaky_centered": leaky, "safe_past_only": safe}))
 
 ---
 
-## 6. Decision framework
+## 8. Decision framework
 
 **IF** a feature's value can be updated after t₀ (status fields, "last modified" values, aggregated totals)
 → Use a historical snapshot ("as-of" join) with the value at t₀, or drop the feature.
@@ -204,7 +216,7 @@ print(pd.DataFrame({"s": s, "leaky_centered": leaky, "safe_past_only": safe}))
 
 ---
 
-## 7. Common mistakes
+## 9. Common mistakes
 
 | Mistake | Consequence | Prevention |
 |---|---|---|
@@ -218,7 +230,7 @@ print(pd.DataFrame({"s": s, "leaky_centered": leaky, "safe_past_only": safe}))
 
 ---
 
-## 8. Checklist
+## 10. Checklist
 
 - [ ] Every column has a documented creation time relative to t₀.
 - [ ] Post-outcome columns removed (`LEAKAGE_COLUMNS` in the cookbook data).
@@ -232,7 +244,7 @@ print(pd.DataFrame({"s": s, "leaky_centered": leaky, "safe_past_only": safe}))
 
 ---
 
-## 9. References
+## 11. References
 
 - Kaufman, S., Rosset, S., Perlich, C. & Stitelman, O. (2012). "Leakage in data mining: Formulation, detection, and avoidance." *ACM TKDD* 6(4), 1–21. https://doi.org/10.1145/2382577.2382579
 - Kapoor, S. & Narayanan, A. (2023). "Leakage and the reproducibility crisis in machine-learning-based science." *Patterns* 4(9). https://doi.org/10.1016/j.patter.2023.100804

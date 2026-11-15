@@ -1,6 +1,6 @@
 # Iterative Improvement: Choosing the Next Best Action
 
-> **Folder:** 06_model_improvement · **Prev:** [model_interpretation.md](model_interpretation.md) · **Next:** [experiment_tracking.md](../07_experimentation/experiment_tracking.md) · **Related:** [project_lifecycle.md](../00_methodology/project_lifecycle.md) §6, [regression error_analysis.md](../03_regression/error_analysis.md), [classification error_analysis.md](../04_classification/error_analysis.md), [ts evaluation](../05_time_series/evaluation.md)
+> **Folder:** 06_model_improvement · **Prev:** [model_interpretation.md](model_interpretation.md) · **Next:** [experiment_tracking.md](../07_experimentation/experiment_tracking.md) · **Related:** [project_lifecycle.md](../00_methodology/project_lifecycle.md) §8, [regression error_analysis.md](../03_regression/error_analysis.md), [classification error_analysis.md](../04_classification/error_analysis.md), [ts evaluation](../05_time_series/evaluation.md)
 
 ---
 
@@ -27,7 +27,7 @@ After the first end-to-end result, and after every major evaluation round.
 **Estimating the ceiling.** Before investing, estimate how much improvement is possible:
 - **Irreducible noise:** repeated measurements, a duplicate-label agreement rate, or lab measurement uncertainty give the noise floor. For yield measured with ±3% precision, no model can do much better than that.
 - **Human or expert performance** (if relevant) and the best performance reported for similar problems.
-- **Learning curves** ([modeling_fundamentals.md](../00_methodology/modeling_fundamentals.md) §4.3): would more data help?
+- **Learning curves** ([modeling_fundamentals.md](../00_methodology/modeling_fundamentals.md) §6.3): would more data help?
 
 **Prioritisation:** expected gain × probability of success / cost. The expected gain comes from error analysis (the error mass of the targeted pattern). The cost includes the time to implement *and* the long-term maintenance.
 
@@ -152,7 +152,7 @@ print(pd.DataFrame([asdict(b) for b in backlog])[["action", "status", "result"]]
 
 **Stopping criteria (choose upfront):** the target performance is reached; the last k accepted experiments each gained less than the noise; the remaining error is close to the measurement noise; or the time/budget is exhausted. Document which one applied.
 
-**Going backwards:** see [project_lifecycle.md](../00_methodology/project_lifecycle.md) §6. Error analysis tells you which earlier stage to revisit.
+**Going backwards:** see [project_lifecycle.md](../00_methodology/project_lifecycle.md) §8. Error analysis tells you which earlier stage to revisit.
 
 ## 9. Common mistakes
 | Mistake | Consequence | Prevention |

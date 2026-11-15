@@ -1,6 +1,6 @@
 # Decision Framework: The Master Map of "What Do I Do Next?"
 
-> **Folder:** 00_methodology · **Prev:** [problem_framing.md](problem_framing.md) · **Next:** [data_leakage.md](data_leakage.md) · **Related:** every recipe's §6. This file is the index of those decisions.
+> **Folder:** 00_methodology · **Prev:** [problem_framing.md](problem_framing.md) · **Next:** [data_leakage.md](data_leakage.md) · **Related:** every recipe's §8 (Decision framework). This file is the index of those decisions.
 
 ---
 
@@ -8,13 +8,17 @@
 
 **What it solves.** It gathers the cookbook's key decision points into one place. When you are unsure what to do next, start here: find your situation, and follow the link to the recipe that handles it.
 
+---
+
+## 2. When to use it
+
 **When to use it.** At the start of a project, to pick the workflow. At every "now what?" moment. And before reporting results, as a sanity pass.
 
 **When not to use it.** As a substitute for the recipes. Each decision here is a summary; the reasoning, code and caveats are in the linked recipe.
 
 ---
 
-## 2. Conceptual foundation
+## 3. Conceptual foundation
 
 Three principles underlie every decision in the cookbook:
 
@@ -26,9 +30,16 @@ These principles cannot be broken by any rule of thumb below. When a rule and a 
 
 ---
 
-## 3. Procedure: navigating a new problem
+## 4. Assumptions and limitations
 
-### Step 1 — Which problem family? (detailed in [problem_framing.md](../00_methodology/problem_framing.md) §2.3)
+- The tables encode defaults that work for typical tabular, time-series and (via sections 09–21) other problems. Unusual data structures may need different choices, so always run the diagnostic first.
+- Thresholds quoted in the tables (e.g. "≲ 20 levels", "< 5% missing") are prompts for investigation, not hard rules.
+
+---
+
+## 5. Procedure: navigating a new problem
+
+### Step 1 — Which problem family? (detailed in [problem_framing.md](../00_methodology/problem_framing.md) §3.3)
 
 ```
 Is the target observed (labelled) for historical examples?
@@ -66,11 +77,11 @@ Is the target observed (labelled) for historical examples?
 
 ---
 
-## 4. Implementation: decision tables by topic
+## 6. Implementation: decision tables by topic
 
 This section is a navigable index of decisions. Each line gives the trigger, the recommended action and the recipe with details.
 
-### 4.1 Data understanding and quality
+### 6.1 Data understanding and quality
 
 | IF you observe… | THEN… | See |
 |---|---|---|
@@ -82,7 +93,7 @@ This section is a navigable index of decisions. Each line gives the trigger, the
 | Several rows per entity | Use grouped validation; consider entity-level features | [validation_reference.md](../08_quick_references/validation_reference.md) |
 | A feature almost perfectly predicts the target | Suspect leakage first | [data_leakage.md](data_leakage.md) |
 
-### 4.2 Preprocessing and features
+### 6.2 Preprocessing and features
 
 | IF… | THEN… | See |
 |---|---|---|
@@ -94,7 +105,7 @@ This section is a navigable index of decisions. Each line gives the trigger, the
 | Domain knowledge suggests ratios, interactions, physical quantities | Engineer them explicitly; they often beat algorithm changes | [feature_engineering.md](../02_preprocessing/feature_engineering.md) |
 | Highly correlated features | Matters for coefficient interpretation, rarely for prediction; consider regularisation | [feature_selection.md](../06_model_improvement/feature_selection.md) |
 
-### 4.3 Modelling
+### 6.3 Modelling
 
 | IF… | THEN… | See |
 |---|---|---|
@@ -105,7 +116,7 @@ This section is a navigable index of decisions. Each line gives the trigger, the
 | Training ≈ validation, both poor | Underfitting: richer features or a more flexible model | [modeling_fundamentals.md](modeling_fundamentals.md) |
 | Model choice depends on tuned hyperparameters | Use nested CV, or a fixed tuning budget per model on the same folds | [cross_validation.md](../06_model_improvement/cross_validation.md) |
 
-### 4.4 Evaluation
+### 6.4 Evaluation
 
 | IF… | THEN… | See |
 |---|---|---|
@@ -117,7 +128,7 @@ This section is a navigable index of decisions. Each line gives the trigger, the
 | Forecasting | Compare against seasonal naive; use MASE; evaluate per horizon | [ts evaluation](../05_time_series/evaluation.md) |
 | Two models differ by less than the CV std | Treat them as equivalent; choose the simpler or more robust one | [cross_validation.md](../06_model_improvement/cross_validation.md) |
 
-### 4.5 Improvement
+### 6.5 Improvement
 
 | IF error analysis shows… | THEN the next action is… | See |
 |---|---|---|
@@ -128,7 +139,7 @@ This section is a navigable index of decisions. Each line gives the trigger, the
 
 ---
 
-## 5. Interpretation: how to use these tables
+## 7. Interpretation: how to use these tables
 
 The tables encode **default** actions, not laws. For each action:
 1. Check that the trigger really applies (run the diagnostic).
@@ -138,7 +149,7 @@ The tables encode **default** actions, not laws. For each action:
 
 ---
 
-## 6. Decision framework: meta-decisions
+## 8. Decision framework: meta-decisions
 
 **IF** two recipes give conflicting advice
 → Defer to the one closer to your deployment conditions. For example, "use all data" conflicts with "keep a temporal test set"; the temporal test set wins when you are deploying on future data.
@@ -147,11 +158,11 @@ The tables encode **default** actions, not laws. For each action:
 → Prefer the conservative option (simpler model, fewer transformations) and state the uncertainty.
 
 **IF** you have spent a long time on one stage without progress
-→ Step back. Run error analysis and check whether you are working on the right stage ([project_lifecycle.md](project_lifecycle.md) §6).
+→ Step back. Run error analysis and check whether you are working on the right stage ([project_lifecycle.md](project_lifecycle.md) §8).
 
 ---
 
-## 7. Common mistakes
+## 9. Common mistakes
 
 | Mistake | Consequence | Prevention |
 |---|---|---|
@@ -162,7 +173,7 @@ The tables encode **default** actions, not laws. For each action:
 
 ---
 
-## 8. Checklist
+## 10. Checklist
 
 - [ ] Problem family identified with the tree in §3.
 - [ ] Validation scheme chosen from the table, justified by the data structure.
@@ -172,7 +183,7 @@ The tables encode **default** actions, not laws. For each action:
 
 ---
 
-## 9. References
+## 11. References
 
 - scikit-learn: *Choosing the right estimator* (flowchart; useful, but only a starting point). https://scikit-learn.org/stable/machine_learning_map.html
 - scikit-learn: *Common pitfalls and recommended practices*. https://scikit-learn.org/stable/common_pitfalls.html

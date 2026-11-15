@@ -8,15 +8,19 @@
 
 **What it solves.** It gives you a map of the whole project, so at any moment you know which stage you are in, what that stage must produce, and when the evidence says you should go back a stage.
 
+---
+
+## 2. When to use it
+
 **When to use it.** At the start of every project (to plan), and whenever you feel stuck or are tempted to "just try another model" (to work out which stage the problem really belongs to).
 
 **When it is not needed.** For a one-off descriptive question ("what was the mean downtime last quarter?") you do not need the full lifecycle. Use [exploratory_data_analysis.md](../01_data_understanding/exploratory_data_analysis.md) directly.
 
 ---
 
-## 2. Conceptual foundation
+## 3. Conceptual foundation
 
-### 2.1 The stages and their deliverables
+### 3.1 The stages and their deliverables
 
 | # | Stage | Key question | Deliverable (artefact you should be able to show) | Recipe |
 |---|---|---|---|---|
@@ -37,7 +41,7 @@
 
 Stage 4 (the split strategy) sits **before** EDA. This is deliberate. Any decision you make after looking at the test data, including outlier rules, feature ideas or thresholds, makes the test estimate optimistic. Decide the split early, put the test set away, and do EDA on the training portion.
 
-### 2.2 It is a loop, not a line
+### 3.2 It is a loop, not a line
 
 ```
             ┌──────────────────────────────────────────────────────────┐
@@ -49,9 +53,9 @@ Stage 4 (the split strategy) sits **before** EDA. This is deliberate. Any decisi
                          error analysis tells you WHICH arrow to take back
 ```
 
-The most common failure in practice is going back to the wrong stage. Typical examples are tuning hyperparameters when the target is mislabelled, or adding features when the validation scheme leaks. The table in §6 maps each symptom to the stage that most likely caused it.
+The most common failure in practice is going back to the wrong stage. Typical examples are tuning hyperparameters when the target is mislabelled, or adding features when the validation scheme leaks. The table in §8 maps each symptom to the stage that most likely caused it.
 
-### 2.3 Three kinds of iteration
+### 3.3 Three kinds of iteration
 
 1. **Inner loop (minutes):** change preprocessing, a feature or a hyperparameter, then re-run cross-validation. Use the validation data only.
 2. **Middle loop (hours to days):** error analysis shows a systematic failure, so you return to EDA or feature engineering, or collect new data.
@@ -61,7 +65,15 @@ Keep the outer loop cheap by getting to a first end-to-end result quickly: basel
 
 ---
 
-## 3. Step-by-step procedure
+## 4. Assumptions and limitations
+
+- The lifecycle assumes a supervised prediction problem with a defined target. For exploratory or unsupervised work, use the same loop with different evaluation criteria (see [09_unsupervised_learning](../09_unsupervised_learning/) and [10_anomaly_detection](../10_anomaly_detection/)).
+- Time estimates ("day 1–3") assume a dataset that already exists. Data acquisition can dominate the schedule.
+- Deployment and monitoring (MLOps) are only touched on here; see [20_advanced_methodologies](../20_advanced_methodologies/).
+
+---
+
+## 5. Step-by-step procedure
 
 1. **Write the problem statement** ([problem_framing.md](problem_framing.md)). If you cannot fill in "prediction time" and "decision supported", stop: modelling is premature.
 2. **Inventory and inspect the data.** Write one sentence describing what a row represents. Many later bugs come from getting this wrong, for example rows that are snapshots rather than events, or several rows per entity.
@@ -80,7 +92,7 @@ Keep the outer loop cheap by getting to a first end-to-end result quickly: basel
 
 ---
 
-## 4. Implementation in Python: a project skeleton
+## 6. Implementation in Python: a project skeleton
 
 A minimal, reusable layout. Details are in [reproducibility.md](../07_experimentation/reproducibility.md).
 
@@ -158,7 +170,7 @@ for name, model in models.items():
 
 ---
 
-## 5. Interpretation
+## 7. Interpretation
 
 - **The baseline is the reference point.** Ridge MAE much lower than the baseline MAE means there is learnable signal. If a reasonable model barely beats the baseline, suspect the framing, the features or the data quality before blaming the algorithm.
 - **The CV standard deviation is your noise floor.** If a later idea improves MAE by less than about one CV standard deviation, treat the improvement as unproven.
@@ -166,7 +178,7 @@ for name, model in models.items():
 
 ---
 
-## 6. Decision framework: when to go back, and where
+## 8. Decision framework: when to go back, and where
 
 | Symptom observed | Most likely root cause | Go back to |
 |---|---|---|
@@ -187,7 +199,7 @@ for name, model in models.items():
 
 ---
 
-## 7. Common mistakes
+## 9. Common mistakes
 
 | Mistake | Consequence | Prevention |
 |---|---|---|
@@ -200,7 +212,7 @@ for name, model in models.items():
 
 ---
 
-## 8. Checklist
+## 10. Checklist
 
 - [ ] Problem statement written (target, unit, prediction time, decision, metric, baseline).
 - [ ] One sentence describing what a row represents.
@@ -215,7 +227,7 @@ for name, model in models.items():
 
 ---
 
-## 9. References
+## 11. References
 
 - Chapman, P. et al. (2000). *CRISP-DM 1.0: Step-by-step data mining guide*. The classic process model. Note that it, too, is iterative.
 - Sculley, D. et al. (2015). "Hidden Technical Debt in Machine Learning Systems." *NeurIPS 28*. https://papers.nips.cc/paper/2015/hash/86df7dcfd896fcaf2674f757a2463eba-Abstract.html
