@@ -41,7 +41,8 @@ DS-Cookbook/
 ├── tools/
 │   ├── validate_code_blocks.py   Runs every ```python block of every recipe
 │   └── check_links.py            Checks all relative links between recipes
-└── requirements.txt        Pinned, validated package versions
+├── requirements.txt        Pinned, validated package versions
+└── LICENSE                 MIT License
 ```
 
 ---
@@ -198,3 +199,9 @@ The cookbook covers methodology, tabular ML, time series, unsupervised learning,
 - **Chemistry-specific tooling** (RDKit descriptors, fingerprints, scaffold splits in code); referenced in [18](18_scientific_machine_learning/) and [15](15_graph_machine_learning/).
 
 New recipes should follow the 11-section structure and the update rule in [project_retrospective.md](21_practical_projects/project_retrospective.md): general, validated, structured.
+
+---
+
+## License
+
+Released under the [MIT License](LICENSE): the code and the text may be reused, modified and redistributed, including commercially, provided the copyright notice is kept.
