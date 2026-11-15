@@ -4,6 +4,46 @@ A **field manual** for solving real Data Science and Machine Learning problems. 
 
 It is not a textbook. Each recipe tells you **what to do, why, when (and when not), how to implement it, how to read the outputs, and what to do next**.
 
+**At a glance:** 22 sections (00–21) · 105 recipes · every Python block executed by an automated validator · CPU-only by default · no paid APIs, cloud services or downloads needed for the runnable examples.
+
+---
+
+## Quick start
+
+```bash
+git clone https://github.com/CarlosSolisGarcia/DS-Cookbook.git
+```
+
+```bash
+cd DS-Cookbook && python -m venv .venv && source .venv/bin/activate && pip install -r requirements.txt
+```
+
+Then open a workflow recipe (for example [regression_workflow.md](03_regression/regression_workflow.md)) and run its code blocks **from the repository root**. Each block is self-contained and imports the shared synthetic data:
+
+```python
+from cookbook_data import load_clean_process_yield
+
+df = load_clean_process_yield()          # batch-reactor yield data with known structure
+print(df.shape)
+print(df.head())
+```
+
+---
+
+## Repository structure
+
+```text
+DS-Cookbook/
+├── 00_methodology/ … 08_quick_references/   Part I: core cookbook (methodology, tabular ML, time series)
+├── 09_unsupervised_learning/ … 21_practical_projects/   Part II: extended domains, cross-cutting methods, project playbook
+├── cookbook_data.py        Seeded synthetic datasets used by all recipes
+├── cookbook_utils.py       Shared helpers (forecast metrics, rolling-origin evaluation, direct features)
+├── tools/
+│   ├── validate_code_blocks.py   Runs every ```python block of every recipe
+│   └── check_links.py            Checks all relative links between recipes
+└── requirements.txt        Pinned, validated package versions
+```
+
 ---
 
 ## How to use this cookbook
