@@ -494,7 +494,10 @@ def make_multirate_streams(minutes: int = 120, seed: int = 42) -> dict:
     t0 = pd.Timestamp("2024-05-01 08:00:00")
     secs = np.arange(minutes * 60)
     load = 0.6 + 0.3 * (secs > 40 * 60) - 0.4 * ((secs > 80 * 60) & (secs < 95 * 60))
-    load = pd.Series(load).rolling(60, min_periods=1).mean().to_numpy()
+    switches = np.cumsum(rng.exponential(150, minutes))                  # small load changes every ~2.5 min
+    level = rng.normal(0, 0.08, len(switches))
+    load = load + level[np.searchsorted(switches, secs).clip(0, len(level) - 1)]
+    load = pd.Series(load).rolling(15, min_periods=1).mean().to_numpy()
     vib_t = t0 + pd.to_timedelta(secs, unit="s")
     vib = 1.0 + 2.0 * load + rng.normal(0, 0.15, len(secs))
     keep = ~((secs >= 55 * 60) & (secs < 58 * 60))
