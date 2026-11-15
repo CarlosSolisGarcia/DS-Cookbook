@@ -37,7 +37,7 @@ These principles cannot be broken by any rule of thumb below. When a rule and a 
 
 ---
 
-## 5. Procedure: navigating a new problem
+## 5. Step-by-step procedure: navigating a new problem
 
 ### Step 1 — Which problem family? (detailed in [problem_framing.md](../00_methodology/problem_framing.md) §3.3)
 
@@ -77,7 +77,7 @@ Is the target observed (labelled) for historical examples?
 
 ---
 
-## 6. Implementation: decision tables by topic
+## 6. Python implementation (here: decision tables by topic)
 
 This section is a navigable index of decisions. Each line gives the trigger, the recommended action and the recipe with details.
 

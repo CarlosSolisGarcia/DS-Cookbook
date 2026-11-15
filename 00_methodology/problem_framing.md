@@ -118,7 +118,7 @@ Use the template in §6 and get it confirmed by the stakeholder.
 
 ---
 
-## 6. Implementation: problem statement template
+## 6. Python implementation: problem statement template and feature-contract check
 
 Keep this as `README.md` or `reports/problem_statement.md` in your project. A filled-in example for the cookbook's predictive-maintenance dataset:
 

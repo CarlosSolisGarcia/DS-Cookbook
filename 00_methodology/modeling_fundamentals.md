@@ -88,7 +88,7 @@ A baseline answers: *How much of the score is just the easy part?* Without it yo
 
 ---
 
-## 6. Implementation in Python
+## 6. Python implementation
 
 ### 6.1 A reusable model-comparison function
 

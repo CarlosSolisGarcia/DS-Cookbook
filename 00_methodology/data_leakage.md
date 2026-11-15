@@ -70,7 +70,7 @@ Compare the score with domain expectations and with the baseline. Big unexplaine
 
 ---
 
-## 6. Implementation in Python
+## 6. Python implementation
 
 ### 6.1 Detecting target leakage with univariate screening
 

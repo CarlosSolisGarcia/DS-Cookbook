@@ -92,7 +92,7 @@ Keep the outer loop cheap by getting to a first end-to-end result quickly: basel
 
 ---
 
-## 6. Implementation in Python: a project skeleton
+## 6. Python implementation: a project skeleton
 
 A minimal, reusable layout. Details are in [reproducibility.md](../07_experimentation/reproducibility.md).
 
